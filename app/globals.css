@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --banana-cream: #FFF8EA;
+  --banana-cream-dark: #F7EBD5;
+  --banana-yellow: #FFC928;
+  --banana-yellow-dark: #E5A900;
+  --chocolate: #3A1F16;
+  --chocolate-dark: #24120D;
+  --chocolate-soft: #704838;
+  --cocoa-muted: #92766A;
+  --warm-white: #FFFFFF;
+  --border-soft: #EBDCC5;
+  --success-green: #6F8B58;
+  --danger-red: #B85C4B;
+  --star-gold: #F6B91A;
+}
+
+html,
+body {
+  background-color: var(--banana-cream);
+  color: var(--chocolate);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-dm-sans), system-ui, sans-serif;
+  min-height: 100dvh;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--chocolate);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Decorative curved blob */
+.bt-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(40px);
+  opacity: 0.55;
+  pointer-events: none;
+}

@@ -11,9 +11,20 @@ export async function connectMongo() {
   if (!uri) throw new Error("MONGODB_URI is not set");
   if (cached.conn) return cached.conn;
   if (!cached.promise) {
-    cached.promise = mongoose.connect(uri, { dbName, bufferCommands: false });
+    cached.promise = mongoose.connect(uri, {
+      dbName,
+      bufferCommands: false,
+      serverSelectionTimeoutMS: 8000,
+    });
   }
-  cached.conn = await cached.promise;
+  try {
+    cached.conn = await cached.promise;
+  } catch (err) {
+    // If the first connect failed (bad URI, IP not allow-listed, etc.),
+    // drop the cached rejected promise so the next request can retry.
+    cached.promise = null;
+    throw err;
+  }
   return cached.conn;
 }
 

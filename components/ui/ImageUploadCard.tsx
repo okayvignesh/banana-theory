@@ -1,14 +1,14 @@
 "use client";
 
-import { Camera, Trash2, Upload } from "lucide-react";
-import { useRef, useState } from "react";
-import Image from "next/image";
+import { Camera, LoaderCircle, Trash2, Upload } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import type { PhotoType } from "@/lib/review-types";
 
 type Props = {
   photoType: PhotoType;
   onUploaded: (url: string) => void;
   onCleared: () => void;
+  onBusyChange?: (busy: boolean) => void;
   currentUrl?: string;
 };
 
@@ -19,12 +19,17 @@ export function ImageUploadCard({
   photoType,
   onUploaded,
   onCleared,
+  onBusyChange,
   currentUrl,
 }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(currentUrl ?? null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    onBusyChange?.(busy);
+  }, [busy, onBusyChange]);
 
   async function handleFile(file: File) {
     setError(null);
@@ -72,11 +77,26 @@ export function ImageUploadCard({
             <img
               src={preview}
               alt="Your upload"
-              className="w-full h-full object-cover"
+              className={
+                "w-full h-full object-cover transition-all " +
+                (busy ? "blur-sm scale-[1.02]" : "")
+              }
             />
             {busy ? (
-              <div className="absolute inset-0 grid place-items-center bg-chocolate/40 text-white text-sm">
-                Uploading…
+              <div
+                role="status"
+                aria-live="polite"
+                className="absolute inset-0 grid place-items-center bg-chocolate/60 backdrop-blur-[2px]"
+              >
+                <div className="flex flex-col items-center gap-2 text-white">
+                  <LoaderCircle
+                    className="size-8 animate-spin"
+                    strokeWidth={2.5}
+                    aria-hidden
+                  />
+                  <div className="text-sm font-semibold">Uploading your photo…</div>
+                  <div className="text-xs text-white/80">Hang tight, just a sec.</div>
+                </div>
               </div>
             ) : null}
           </div>
@@ -84,14 +104,16 @@ export function ImageUploadCard({
             <button
               type="button"
               onClick={clear}
-              className="inline-flex items-center gap-2 text-sm text-chocolate font-semibold px-3 py-2 rounded-full border border-border hover:bg-cream"
+              disabled={busy}
+              className="inline-flex items-center gap-2 text-sm text-chocolate font-semibold px-3 py-2 rounded-full border border-border hover:bg-cream disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Trash2 className="size-4" /> Remove
             </button>
             <button
               type="button"
               onClick={() => inputRef.current?.click()}
-              className="inline-flex items-center gap-2 text-sm text-chocolate font-semibold px-3 py-2 rounded-full border border-border hover:bg-cream"
+              disabled={busy}
+              className="inline-flex items-center gap-2 text-sm text-chocolate font-semibold px-3 py-2 rounded-full border border-border hover:bg-cream disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Camera className="size-4" /> Change
             </button>

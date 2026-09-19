@@ -25,6 +25,7 @@ export function PhotoStep({
   const [choice, setChoice] = useState<PhotoType | null>(
     photoType ?? (photoUrl ? "banana" : null)
   );
+  const [uploading, setUploading] = useState(false);
 
   function pick(t: PhotoType) {
     setChoice(t);
@@ -71,6 +72,7 @@ export function PhotoStep({
             currentUrl={photoUrl}
             onUploaded={(url) => onChange({ photoUrl: url, photoType: choice })}
             onCleared={() => onChange({ photoUrl: undefined })}
+            onBusyChange={setUploading}
           />
           <button
             type="button"
@@ -78,7 +80,8 @@ export function PhotoStep({
               setChoice(null);
               onChange({ photoUrl: undefined, photoType: undefined });
             }}
-            className="text-cocoa text-sm underline underline-offset-4 hover:text-chocolate"
+            disabled={uploading}
+            className="text-cocoa text-sm underline underline-offset-4 hover:text-chocolate disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Change photo type
           </button>
@@ -86,11 +89,24 @@ export function PhotoStep({
       )}
 
       <div className="grid grid-cols-[auto,1fr] gap-2 pt-2">
-        <SecondaryButton onClick={onBack} className="!w-auto px-4" icon={<ArrowLeft className="size-4" />}>
+        <SecondaryButton
+          onClick={onBack}
+          disabled={uploading}
+          className="!w-auto px-4"
+          icon={<ArrowLeft className="size-4" />}
+        >
           Back
         </SecondaryButton>
-        <PrimaryButton onClick={onNext}>
-          {photoUrl ? "Continue" : "Skip & continue"}
+        <PrimaryButton
+          onClick={onNext}
+          loading={uploading}
+          disabled={uploading}
+        >
+          {uploading
+            ? "Uploading photo…"
+            : photoUrl
+            ? "Continue"
+            : "Skip & continue"}
         </PrimaryButton>
       </div>
     </div>
